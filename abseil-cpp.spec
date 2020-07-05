@@ -1,3 +1,6 @@
+# Force out of source build
+%undefine __cmake_in_source_build
+
 Name:           abseil-cpp
 Version:        20200225.2
 Release:        2%{?dist}
@@ -37,12 +40,12 @@ Development headers for %{name}
 
 
 %build
-%cmake . -DCMAKE_BUILD_TYPE=RelWithDebInfo
-%make_build
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
+%cmake_build
 
 
 %install
-%make_install
+%cmake_install
 
 
 %files
