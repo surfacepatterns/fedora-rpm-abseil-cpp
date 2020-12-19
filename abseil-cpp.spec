@@ -11,6 +11,7 @@ URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
 
 # Explicitly include <limits> for std::numeric_limits
+# Already addressed in upstream git.
 Patch0:         %{name}-20200923.2.gcc11.patch
 
 BuildRequires:  cmake
