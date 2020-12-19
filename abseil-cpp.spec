@@ -10,6 +10,9 @@ License:        ASL 2.0
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
 
+# Explicitly include <limits> for std::numeric_limits
+Patch0:         %{name}-20200923.2.gcc11.patch
+
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 
@@ -36,7 +39,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 Development headers for %{name}
 
 %prep
-%autosetup
+%autosetup -p1
 
 
 %build
