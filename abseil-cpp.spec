@@ -3,7 +3,7 @@
 
 Name:           abseil-cpp
 Version:        20200923.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        C++ Common Libraries
 
 License:        ASL 2.0
@@ -62,6 +62,9 @@ Development headers for %{name}
 %{_libdir}/cmake/absl
 
 %changelog
+* Mon Jan 25 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20200923.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
 * Sat Dec 19 2020 Rich Mattes <richmattes@gmail.com> - 20200923.2-1
 - Update to release 20200923.2
 - Rebuild to fix tagging in koji (rhbz#1885561)
