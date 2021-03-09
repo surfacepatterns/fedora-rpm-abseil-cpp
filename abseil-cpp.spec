@@ -10,8 +10,11 @@ License:        ASL 2.0
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
 
+Patch0:         abseil-cpp-20200923.3-typematch.patch
+
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
+BuildRequires:  make
 
 %description
 Abseil is an open-source collection of C++ library code designed to augment
