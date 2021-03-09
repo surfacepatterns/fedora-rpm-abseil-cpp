@@ -2,17 +2,13 @@
 %undefine __cmake_in_source_build
 
 Name:           abseil-cpp
-Version:        20200923.2
-Release:        2%{?dist}
+Version:        20200923.3
+Release:        1%{?dist}
 Summary:        C++ Common Libraries
 
 License:        ASL 2.0
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
-
-# Explicitly include <limits> for std::numeric_limits
-# Already addressed in upstream git.
-Patch0:         %{name}-20200923.2.gcc11.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -62,6 +58,9 @@ Development headers for %{name}
 %{_libdir}/cmake/absl
 
 %changelog
+* Mon Mar 08 2021 Rich Mattes <richmattes@gmail.com> - 20200923.3-1
+- Update to release 20200923.3
+
 * Mon Jan 25 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20200923.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
