@@ -1,8 +1,11 @@
 # Force out of source build
 %undefine __cmake_in_source_build
 
+# Installed library version
+%global lib_version 2103.0.1
+
 Name:           abseil-cpp
-Version:        20200923.3
+Version:        20210324.2
 Release:        1%{?dist}
 Summary:        C++ Common Libraries
 
@@ -10,10 +13,16 @@ License:        ASL 2.0
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
 
-Patch0:         abseil-cpp-20200923.3-typematch.patch
+# Set up system gtest and gmock targets to allow test suite to be built.
+# abseil-cpp expects the targets to be created by a bundled copy of gtest/gmock.
+# This patch replicates those targets via find_library and imported targets.
+# Not submitted upstream.
+Patch1:         abseil-cpp-20210324-gtest.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
+BuildRequires:  gmock-devel
+BuildRequires:  gtest-devel
 BuildRequires:  make
 
 %description
@@ -39,28 +48,40 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 Development headers for %{name}
 
 %prep
-%autosetup -p1
-
+%autosetup -p1 -S gendiff
+sed -i 's|GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST|//|' absl/container/internal/unordered_map_modifiers_test.h
 
 %build
-%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
+%cmake \
+  -DABSL_USE_EXTERNAL_GOOGLETEST:BOOL=ON \
+  -DBUILD_TESTING:BOOL=ON \
+  -DCMAKE_BUILD_TYPE:STRING=None \
+  -DCMAKE_CXX_STANDARD:STRING=17
 %cmake_build
 
 
 %install
 %cmake_install
 
+%check
+%ctest --output-on-failure
 
 %files
 %license LICENSE
-%doc FAQ.md LTS.md README.md UPGRADES.md
-%{_libdir}/libabsl_*.so
+%doc FAQ.md README.md UPGRADES.md
+%{_libdir}/libabsl_*.so.%{lib_version}
 
 %files devel
 %{_includedir}/absl
+%{_libdir}/libabsl_*.so
 %{_libdir}/cmake/absl
+%{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri May 21 2021 Rich Mattes <richmattes@gmail.com> - 20210324.1-2
+- Update to release 20210324.2
+- Enable and run test suite
+
 * Mon Mar 08 2021 Rich Mattes <richmattes@gmail.com> - 20200923.3-1
 - Update to release 20200923.3
 
