@@ -1,28 +1,23 @@
-# Force out of source build
-%undefine __cmake_in_source_build
-
 # Installed library version
-%global lib_version 2103.0.1
+%global lib_version 2111.0.0
 
 Name:           abseil-cpp
-Version:        20210324.2
-Release:        4%{?dist}
+Version:        20211102.0
+Release:        1%{?dist}
 Summary:        C++ Common Libraries
 
 License:        ASL 2.0
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
 
-# Set up system gtest and gmock targets to allow test suite to be built.
-# abseil-cpp expects the targets to be created by a bundled copy of gtest/gmock.
-# This patch replicates those targets via find_library and imported targets.
-# Not submitted upstream.
-Patch1:         abseil-cpp-20210324-gtest.patch
-
 # Disable CPU frequency detection on armv7hl architectures.
 # Makes test consistent with aarch64 CPUs.
 # Not submitted upstream.
-Patch2:         abseil-cpp-20210324.2-armv7.patch
+Patch0:         abseil-cpp-20210324.2-armv7.patch
+# Remove test assertions that use ::testing::Conditional, which is not in a
+# released version of GTest. Not submitted upstream, as this is a workaround
+# rather than a fix. https://github.com/abseil/abseil-cpp/issues/1063
+Patch1:         abseil-cpp-20211102.0-gtest-unreleased-features.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -55,9 +50,22 @@ Development headers for %{name}
 %prep
 %autosetup -p1 -S gendiff
 
+# Replace GTEST_FLAG_GET, which is not in a released version of GTest, with an
+# appropriate default value. Not submitted upstream, as this is a workaround
+# rather than a fix. https://github.com/abseil/abseil-cpp/issues/1063
+#
+# The find-then-sed pattern means we only discard mtimes on files that actually
+# needed to be modified.
+find . -type f -name '*.cc' \
+    -exec gawk '/GTEST_FLAG_GET/ { print FILENAME ; nextfile }' '{}' '+' |
+  xargs -r -t sed -r -i 's/GTEST_FLAG_GET/::testing::GTEST_FLAG/g'
+
+
 %build
 %cmake \
   -DABSL_USE_EXTERNAL_GOOGLETEST:BOOL=ON \
+  -DABSL_FIND_GOOGLETEST:BOOL=ON \
+  -DABSL_ENABLE_INSTALL:BOOL=ON \
   -DBUILD_TESTING:BOOL=ON \
   -DCMAKE_BUILD_TYPE:STRING=None \
   -DCMAKE_CXX_STANDARD:STRING=17
@@ -88,6 +96,9 @@ Development headers for %{name}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Feb 18 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20211102.0-1
+- Update to 20211102.0 (close RHBZ#2019691)
+
 * Mon Jan 31 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20210324.2-4
 - Fix test failure (fix RHBZ#2045186)
 
