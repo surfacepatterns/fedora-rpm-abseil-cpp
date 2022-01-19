@@ -6,7 +6,7 @@
 
 Name:           abseil-cpp
 Version:        20210324.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        C++ Common Libraries
 
 License:        ASL 2.0
@@ -90,6 +90,9 @@ sed -i 's|GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST|//|' absl/container/inte
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20210324.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20210324.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
