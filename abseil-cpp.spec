@@ -6,7 +6,7 @@
 
 Name:           abseil-cpp
 Version:        20210324.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        C++ Common Libraries
 
 License:        ASL 2.0
@@ -54,8 +54,6 @@ Development headers for %{name}
 
 %prep
 %autosetup -p1 -S gendiff
-# Remove macro only defined in googletest git master
-sed -i 's|GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST|//|' absl/container/internal/unordered_map_modifiers_test.h
 
 %build
 %cmake \
@@ -90,6 +88,9 @@ sed -i 's|GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST|//|' absl/container/inte
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Jan 31 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20210324.2-4
+- Fix test failure (fix RHBZ#2045186)
+
 * Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20210324.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
