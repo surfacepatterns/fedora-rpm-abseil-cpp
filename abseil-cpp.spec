@@ -79,9 +79,9 @@ find . -type f -name '*.cc' \
 # s390x does not seem to be supported, several tests fail.
 # Make tests informational until failures are resolved.
 %ifarch s390x
-%ctest --output-on-failure || :
+%ctest || :
 %else
-%ctest --output-on-failure
+%ctest
 %endif
 
 %files
@@ -98,6 +98,7 @@ find . -type f -name '*.cc' \
 %changelog
 * Fri Feb 18 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20211102.0-1
 - Update to 20211102.0 (close RHBZ#2019691)
+- Drop --output-on-failure, already in %%ctest expansion
 
 * Mon Jan 31 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20210324.2-4
 - Fix test failure (fix RHBZ#2045186)
