@@ -60,6 +60,50 @@ find . -type f -name '*.cc' \
     -exec gawk '/GTEST_FLAG_GET/ { print FILENAME ; nextfile }' '{}' '+' |
   xargs -r -t sed -r -i 's/GTEST_FLAG_GET/::testing::GTEST_FLAG/g'
 
+# It’s extremely difficult to pass gtest options through to the test
+# executables from ctest. We could probably skip an entire executable (e.g.
+# absl_symbolize_test) by symlinking it to /bin/true, but the easiest way to
+# skip a *single test* is to patch the test source.
+
+%ifarch s390x
+# TODO: why does this test fail?
+#
+#  48/167 Test  #49: absl_symbolize_test ................................***Failed    0.02 sec
+# TestWithReturnAddress passed
+# [==========] Running 7 tests from 1 test suite.
+# [----------] Global test environment set-up.
+# [----------] 7 tests from Symbolize
+# [ RUN      ] Symbolize.Cached
+# [       OK ] Symbolize.Cached (0 ms)
+# [ RUN      ] Symbolize.Truncation
+# [       OK ] Symbolize.Truncation (0 ms)
+# [ RUN      ] Symbolize.SymbolizeWithDemangling
+# [       OK ] Symbolize.SymbolizeWithDemangling (0 ms)
+# [ RUN      ] Symbolize.SymbolizeSplitTextSections
+# [       OK ] Symbolize.SymbolizeSplitTextSections (0 ms)
+# [ RUN      ] Symbolize.SymbolizeWithMultipleMaps
+# /builddir/build/BUILD/abseil-cpp-20210324.2/absl/debugging/symbolize_test.cc:315: Failure
+# Expected equality of these values:
+#   "kPadding1"
+#   buf
+#     Which is: ""
+# /builddir/build/BUILD/abseil-cpp-20210324.2/absl/debugging/symbolize_test.cc:349: Failure
+# Expected equality of these values:
+#   expected[i]
+#     Which is: "kPadding1"
+#   buf
+#     Which is: ""
+# /builddir/build/BUILD/abseil-cpp-20210324.2/absl/debugging/symbolize_test.cc:349: Failure
+# Expected equality of these values:
+#   expected[i]
+#     Which is: "kPadding1"
+#   buf
+#     Which is: ""
+# [  FAILED  ] Symbolize.SymbolizeWithMultipleMaps (1 ms)
+sed -r -i 's/\bSymbolizeWithMultipleMaps\b/DISABLED_&/' \
+    absl/debugging/symbolize_test.cc
+%endif
+
 
 %build
 %cmake \
@@ -76,13 +120,7 @@ find . -type f -name '*.cc' \
 %cmake_install
 
 %check
-# s390x does not seem to be supported, several tests fail.
-# Make tests informational until failures are resolved.
-%ifarch s390x
-%ctest || :
-%else
 %ctest
-%endif
 
 %files
 %license LICENSE
@@ -99,6 +137,7 @@ find . -type f -name '*.cc' \
 * Fri Feb 18 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20211102.0-1
 - Update to 20211102.0 (close RHBZ#2019691)
 - Drop --output-on-failure, already in %%ctest expansion
+- On s390x, instead of ignoring all tests, skip only the single failing test
 
 * Mon Jan 31 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20210324.2-4
 - Fix test failure (fix RHBZ#2045186)
