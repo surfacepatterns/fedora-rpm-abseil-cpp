@@ -20,10 +20,12 @@ Patch0:         abseil-cpp-20210324.2-armv7.patch
 Patch1:         abseil-cpp-20211102.0-gtest-unreleased-features.patch
 
 BuildRequires:  cmake
+# The default make backend would work just as well; ninja is observably faster
+BuildRequires:  ninja-build
 BuildRequires:  gcc-c++
+
 BuildRequires:  gmock-devel
 BuildRequires:  gtest-devel
-BuildRequires:  make
 
 %description
 Abseil is an open-source collection of C++ library code designed to augment
@@ -107,6 +109,7 @@ sed -r -i 's/\bSymbolizeWithMultipleMaps\b/DISABLED_&/' \
 
 %build
 %cmake \
+  -GNinja \
   -DABSL_USE_EXTERNAL_GOOGLETEST:BOOL=ON \
   -DABSL_FIND_GOOGLETEST:BOOL=ON \
   -DABSL_ENABLE_INSTALL:BOOL=ON \
@@ -138,6 +141,7 @@ sed -r -i 's/\bSymbolizeWithMultipleMaps\b/DISABLED_&/' \
 - Update to 20211102.0 (close RHBZ#2019691)
 - Drop --output-on-failure, already in %%ctest expansion
 - On s390x, instead of ignoring all tests, skip only the single failing test
+- Use ninja backend for CMake: speeds up build with no downsides
 
 * Mon Jan 31 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20210324.2-4
 - Fix test failure (fix RHBZ#2045186)
