@@ -10,14 +10,10 @@ License:        ASL 2.0
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
 
-# Disable CPU frequency detection on armv7hl architectures.
-# Makes test consistent with aarch64 CPUs.
-# Not submitted upstream.
-Patch0:         abseil-cpp-20210324.2-armv7.patch
 # Remove test assertions that use ::testing::Conditional, which is not in a
 # released version of GTest. Not submitted upstream, as this is a workaround
 # rather than a fix. https://github.com/abseil/abseil-cpp/issues/1063
-Patch1:         abseil-cpp-20211102.0-gtest-unreleased-features.patch
+Patch0:         abseil-cpp-20211102.0-gtest-unreleased-features.patch
 
 BuildRequires:  cmake
 # The default make backend would work just as well; ninja is observably faster
@@ -142,6 +138,7 @@ sed -r -i 's/\bSymbolizeWithMultipleMaps\b/DISABLED_&/' \
 - Drop --output-on-failure, already in %%ctest expansion
 - On s390x, instead of ignoring all tests, skip only the single failing test
 - Use ninja backend for CMake: speeds up build with no downsides
+- Drop patch for armv7hl
 
 * Mon Jan 31 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20210324.2-4
 - Fix test failure (fix RHBZ#2045186)
