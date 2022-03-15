@@ -14,6 +14,26 @@ Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-
 # released version of GTest. Not submitted upstream, as this is a workaround
 # rather than a fix. https://github.com/abseil/abseil-cpp/issues/1063
 Patch0:         abseil-cpp-20211102.0-gtest-unreleased-features.patch
+# SysinfoTest.NominalCPUFrequency in absl_sysinfo_test fails occasionally
+# on aarch64, but see:
+#
+# NominalCPUFrequency Test from SysInfoTest Suite Fails on M1 Mac
+# https://github.com/abseil/abseil-cpp/issues/1053#issuecomment-961432444
+#
+# in which an upstream author opines:
+#
+#   If the only problem you are trying to solve is a failing test, this is safe
+#   to ignore since this code is never called. I should consider stripping this
+#   test out of the open source release. NominalCPUFrequency is only called in
+#   code private to Google and we do have tests on the platforms we use it on.
+#
+# We therefore disable it on all architectures, since any future failures
+# will also not be meaningful.
+#
+# Note also that this test is removed upstream in commit
+# 732b5580f089101ce4b8cdff55bb6461c59a6720 (internal commit
+# 7e8da4f14afd25d11713eee6b743ba31605332bf).
+Patch1:         abseil-cpp-20211102.0-disable-nominalcpufrequency.patch
 
 BuildRequires:  cmake
 # The default make backend would work just as well; ninja is observably faster
@@ -98,6 +118,8 @@ find . -type f -name '*.cc' \
 %changelog
 * Tue Mar 15 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20211102.0-2
 - Disable LTO on s390x to work around test failure
+- Skip SysinfoTest.NominalCPUFrequency on all architectures; it fails
+  occasionally on aarch64, and upstream says we should not care
 
 * Fri Feb 18 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20211102.0-1
 - Update to 20211102.0 (close RHBZ#2019691)
