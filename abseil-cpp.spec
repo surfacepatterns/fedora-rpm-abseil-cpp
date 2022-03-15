@@ -3,7 +3,7 @@
 
 Name:           abseil-cpp
 Version:        20211102.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        C++ Common Libraries
 
 License:        ASL 2.0
@@ -22,6 +22,13 @@ BuildRequires:  gcc-c++
 
 BuildRequires:  gmock-devel
 BuildRequires:  gtest-devel
+
+%ifarch s390x
+# Symbolize.SymbolizeWithMultipleMaps fails in absl_symbolize_test on s390x
+# with LTO
+# https://github.com/abseil/abseil-cpp/issues/1133
+%global _lto_cflags %{nil}
+%endif
 
 %description
 Abseil is an open-source collection of C++ library code designed to augment
@@ -58,50 +65,6 @@ find . -type f -name '*.cc' \
     -exec gawk '/GTEST_FLAG_GET/ { print FILENAME ; nextfile }' '{}' '+' |
   xargs -r -t sed -r -i 's/GTEST_FLAG_GET/::testing::GTEST_FLAG/g'
 
-# It’s extremely difficult to pass gtest options through to the test
-# executables from ctest. We could probably skip an entire executable (e.g.
-# absl_symbolize_test) by symlinking it to /bin/true, but the easiest way to
-# skip a *single test* is to patch the test source.
-
-%ifarch s390x
-# TODO: why does this test fail?
-#
-#  48/167 Test  #49: absl_symbolize_test ................................***Failed    0.02 sec
-# TestWithReturnAddress passed
-# [==========] Running 7 tests from 1 test suite.
-# [----------] Global test environment set-up.
-# [----------] 7 tests from Symbolize
-# [ RUN      ] Symbolize.Cached
-# [       OK ] Symbolize.Cached (0 ms)
-# [ RUN      ] Symbolize.Truncation
-# [       OK ] Symbolize.Truncation (0 ms)
-# [ RUN      ] Symbolize.SymbolizeWithDemangling
-# [       OK ] Symbolize.SymbolizeWithDemangling (0 ms)
-# [ RUN      ] Symbolize.SymbolizeSplitTextSections
-# [       OK ] Symbolize.SymbolizeSplitTextSections (0 ms)
-# [ RUN      ] Symbolize.SymbolizeWithMultipleMaps
-# /builddir/build/BUILD/abseil-cpp-20210324.2/absl/debugging/symbolize_test.cc:315: Failure
-# Expected equality of these values:
-#   "kPadding1"
-#   buf
-#     Which is: ""
-# /builddir/build/BUILD/abseil-cpp-20210324.2/absl/debugging/symbolize_test.cc:349: Failure
-# Expected equality of these values:
-#   expected[i]
-#     Which is: "kPadding1"
-#   buf
-#     Which is: ""
-# /builddir/build/BUILD/abseil-cpp-20210324.2/absl/debugging/symbolize_test.cc:349: Failure
-# Expected equality of these values:
-#   expected[i]
-#     Which is: "kPadding1"
-#   buf
-#     Which is: ""
-# [  FAILED  ] Symbolize.SymbolizeWithMultipleMaps (1 ms)
-sed -r -i 's/\bSymbolizeWithMultipleMaps\b/DISABLED_&/' \
-    absl/debugging/symbolize_test.cc
-%endif
-
 
 %build
 %cmake \
@@ -133,6 +96,9 @@ sed -r -i 's/\bSymbolizeWithMultipleMaps\b/DISABLED_&/' \
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Mar 15 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20211102.0-2
+- Disable LTO on s390x to work around test failure
+
 * Fri Feb 18 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20211102.0-1
 - Update to 20211102.0 (close RHBZ#2019691)
 - Drop --output-on-failure, already in %%ctest expansion
