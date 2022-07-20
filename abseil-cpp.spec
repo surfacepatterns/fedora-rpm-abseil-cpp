@@ -3,7 +3,7 @@
 
 Name:           abseil-cpp
 Version:        20211102.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        C++ Common Libraries
 
 License:        ASL 2.0
@@ -116,6 +116,9 @@ find . -type f -name '*.cc' \
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20211102.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
 * Tue Mar 15 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20211102.0-2
 - Disable LTO on s390x to work around test failure
 - Skip SysinfoTest.NominalCPUFrequency on all architectures; it fails
