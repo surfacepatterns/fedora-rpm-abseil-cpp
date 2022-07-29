@@ -3,7 +3,7 @@
 
 Name:           abseil-cpp
 Version:        20211102.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        C++ Common Libraries
 
 License:        ASL 2.0
@@ -13,7 +13,7 @@ Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-
 # Remove test assertions that use ::testing::Conditional, which is not in a
 # released version of GTest. Not submitted upstream, as this is a workaround
 # rather than a fix. https://github.com/abseil/abseil-cpp/issues/1063
-Patch0:         abseil-cpp-20211102.0-gtest-unreleased-features.patch
+Patch:          abseil-cpp-20211102.0-gtest-unreleased-features.patch
 # SysinfoTest.NominalCPUFrequency in absl_sysinfo_test fails occasionally
 # on aarch64, but see:
 #
@@ -33,7 +33,15 @@ Patch0:         abseil-cpp-20211102.0-gtest-unreleased-features.patch
 # Note also that this test is removed upstream in commit
 # 732b5580f089101ce4b8cdff55bb6461c59a6720 (internal commit
 # 7e8da4f14afd25d11713eee6b743ba31605332bf).
-Patch1:         abseil-cpp-20211102.0-disable-nominalcpufrequency.patch
+Patch:          abseil-cpp-20211102.0-disable-nominalcpufrequency.patch
+# Backport upstream commit 09e96049995584c3489e4bd1467313e3e85af99c, which
+# corresponds to:
+#
+# Do not leak -maes -msse4.1 into pkgconfig
+# https://github.com/abseil/abseil-cpp/pull/1216
+#
+# Fixes RHBZ#2108658.
+Patch:          https://github.com/abseil/abseil-cpp/commit/09e96049995584c3489e4bd1467313e3e85af99c.patch
 
 BuildRequires:  cmake
 # The default make backend would work just as well; ninja is observably faster
@@ -116,6 +124,9 @@ find . -type f -name '*.cc' \
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Jul 29 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20211102.0-4
+- Do not leak -maes -msse4.1 into pkgconfig (fix RHBZ#2108658)
+
 * Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20211102.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
