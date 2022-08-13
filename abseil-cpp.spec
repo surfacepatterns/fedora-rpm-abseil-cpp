@@ -6,7 +6,17 @@ Version:        20220623.0
 Release:        1%{?dist}
 Summary:        C++ Common Libraries
 
-License:        ASL 2.0
+# The entire source is Apache-2.0, except:
+#   - The following files are LicenseRef-Fedora-Public-Domain:
+#       absl/time/internal/cctz/src/tzfile.h
+#         ** This file is in the public domain, so clarified as of
+#         ** 1996-06-05 by Arthur David Olson.
+#       absl/time/internal/cctz/testdata/zoneinfo/iso3166.tab
+#         # This file is in the public domain, so clarified as of
+#         # 2009-05-17 by Arthur David Olson.
+#       absl/time/internal/cctz/testdata/zoneinfo/zone1970.tab
+#         # This file is in the public domain.
+License:        Apache-2.0 AND LicenseRef-Fedora-Public-Domain
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
 
@@ -91,6 +101,7 @@ Development headers for %{name}
 %changelog
 * Sat Aug 13 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20220623.0-1
 - Update to 20220623.0 (close RHBZ#2101021)
+- Update License to SPDX
 
 * Fri Jul 29 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20211102.0-4
 - Do not leak -maes -msse4.1 into pkgconfig (fix RHBZ#2108658)
