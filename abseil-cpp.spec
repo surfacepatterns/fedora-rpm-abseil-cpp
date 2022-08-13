@@ -1,39 +1,15 @@
 # Installed library version
-%global lib_version 2111.0.0
+%global lib_version 2206.0.0
 
 Name:           abseil-cpp
-Version:        20211102.0
-Release:        4%{?dist}
+Version:        20220623.0
+Release:        1%{?dist}
 Summary:        C++ Common Libraries
 
 License:        ASL 2.0
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
 
-# Remove test assertions that use ::testing::Conditional, which is not in a
-# released version of GTest. Not submitted upstream, as this is a workaround
-# rather than a fix. https://github.com/abseil/abseil-cpp/issues/1063
-Patch:          abseil-cpp-20211102.0-gtest-unreleased-features.patch
-# SysinfoTest.NominalCPUFrequency in absl_sysinfo_test fails occasionally
-# on aarch64, but see:
-#
-# NominalCPUFrequency Test from SysInfoTest Suite Fails on M1 Mac
-# https://github.com/abseil/abseil-cpp/issues/1053#issuecomment-961432444
-#
-# in which an upstream author opines:
-#
-#   If the only problem you are trying to solve is a failing test, this is safe
-#   to ignore since this code is never called. I should consider stripping this
-#   test out of the open source release. NominalCPUFrequency is only called in
-#   code private to Google and we do have tests on the platforms we use it on.
-#
-# We therefore disable it on all architectures, since any future failures
-# will also not be meaningful.
-#
-# Note also that this test is removed upstream in commit
-# 732b5580f089101ce4b8cdff55bb6461c59a6720 (internal commit
-# 7e8da4f14afd25d11713eee6b743ba31605332bf).
-Patch:          abseil-cpp-20211102.0-disable-nominalcpufrequency.patch
 # Backport upstream commit 09e96049995584c3489e4bd1467313e3e85af99c, which
 # corresponds to:
 #
@@ -83,24 +59,13 @@ Development headers for %{name}
 %prep
 %autosetup -p1 -S gendiff
 
-# Replace GTEST_FLAG_GET, which is not in a released version of GTest, with an
-# appropriate default value. Not submitted upstream, as this is a workaround
-# rather than a fix. https://github.com/abseil/abseil-cpp/issues/1063
-#
-# The find-then-sed pattern means we only discard mtimes on files that actually
-# needed to be modified.
-find . -type f -name '*.cc' \
-    -exec gawk '/GTEST_FLAG_GET/ { print FILENAME ; nextfile }' '{}' '+' |
-  xargs -r -t sed -r -i 's/GTEST_FLAG_GET/::testing::GTEST_FLAG/g'
-
-
 %build
 %cmake \
   -GNinja \
   -DABSL_USE_EXTERNAL_GOOGLETEST:BOOL=ON \
   -DABSL_FIND_GOOGLETEST:BOOL=ON \
   -DABSL_ENABLE_INSTALL:BOOL=ON \
-  -DBUILD_TESTING:BOOL=ON \
+  -DABSL_BUILD_TESTING:BOOL=ON \
   -DCMAKE_BUILD_TYPE:STRING=None \
   -DCMAKE_CXX_STANDARD:STRING=17
 %cmake_build
@@ -124,6 +89,9 @@ find . -type f -name '*.cc' \
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sat Aug 13 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20220623.0-1
+- Update to 20220623.0 (close RHBZ#2101021)
+
 * Fri Jul 29 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20211102.0-4
 - Do not leak -maes -msse4.1 into pkgconfig (fix RHBZ#2108658)
 
