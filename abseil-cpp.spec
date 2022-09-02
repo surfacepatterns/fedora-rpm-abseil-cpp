@@ -2,8 +2,8 @@
 %global lib_version 2206.0.0
 
 Name:           abseil-cpp
-Version:        20220623.0
-Release:        1%{?dist}
+Version:        20220623.1
+Release:        2%{?dist}
 Summary:        C++ Common Libraries
 
 # The entire source is Apache-2.0, except:
@@ -99,6 +99,9 @@ Development headers for %{name}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Sep 02 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20220623.1-2
+- Update to 20220623.1 (close RHBZ#2123181)
+
 * Sat Aug 13 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 20220623.0-1
 - Update to 20220623.0 (close RHBZ#2101021)
 - Update License to SPDX
