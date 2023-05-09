@@ -91,12 +91,16 @@ Development headers for %{name}
 %autosetup -p1 -S gendiff
 
 %build
+# ABSL_BUILD_TEST_HELPERS is needed to build libraries for the -testing
+# subpackage when tests are not enabled. It is therefore redundant here, but we
+# still supply it to be more explicit.
 %cmake \
   -GNinja \
   -DABSL_USE_EXTERNAL_GOOGLETEST:BOOL=ON \
   -DABSL_FIND_GOOGLETEST:BOOL=ON \
   -DABSL_ENABLE_INSTALL:BOOL=ON \
   -DABSL_BUILD_TESTING:BOOL=ON \
+  -DABSL_BUILD_TEST_HELPERS:BOOL=ON \
   -DCMAKE_BUILD_TYPE:STRING=None \
   -DCMAKE_CXX_STANDARD:STRING=17
 %cmake_build
@@ -231,6 +235,7 @@ Development headers for %{name}
 - Update to 20230125.3 (close RHBZ#2193306)
 - Split installed TESTONLY libraries into a -testing subpackage; explicitly
   list all installed shared libraries
+- Explicitly enable the ABSL_BUILD_TEST_HELPERS CMake option
 
 * Thu Mar 30 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 20230125.2-1
 - Update to 20230125.2 (close RHBZ#2182229)
