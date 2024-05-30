@@ -3,7 +3,7 @@
 
 Name:           abseil-cpp
 Version:        20240116.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        C++ Common Libraries
 
 # The entire source is Apache-2.0, except:
@@ -89,6 +89,17 @@ Development headers for %{name}
 
 %prep
 %autosetup -p1 -S gendiff
+
+%ifarch riscv64
+# NOTE(davidlt): see https://github.com/WebAssembly/design/issues/646
+# [==========] 125 tests from 35 test suites ran. (3501 ms total)
+# [  PASSED  ] 124 tests.
+# [  FAILED  ] 1 test, listed below:
+# [  FAILED  ] FloatingPointLogFormatTest/0.NegativeNaN, where TypeParam = float
+#  1 FAILED TEST
+sed -r -i 's/\bNegativeNaN\b/DISABLED_&/' \
+    absl/log/log_format_test.cc
+%endif
 
 %build
 # ABSL_BUILD_TEST_HELPERS is needed to build libraries for the -testing
@@ -234,6 +245,9 @@ Development headers for %{name}
 %{_libdir}/pkgconfig/absl_*.pc
 
 %changelog
+* Wed May 29 2024 David Abdurachmanov <davidlt@rivosinc.com> - 20240116.2-2
+- Disable NegativeNaN test on riscv64
+
 * Tue Apr 09 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 20240116.2-1
 - Update to 20240116.2 (close RHBZ#2274172)
 
