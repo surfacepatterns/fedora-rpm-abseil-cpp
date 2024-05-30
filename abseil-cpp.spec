@@ -91,6 +91,8 @@ Development headers for %{name}
 %autosetup -p1 -S gendiff
 
 %ifarch riscv64
+# [Bug]: NegativeNaN test fails on riscv64
+# https://github.com/abseil/abseil-cpp/issues/1684
 # NOTE(davidlt): see https://github.com/WebAssembly/design/issues/646
 # [==========] 125 tests from 35 test suites ran. (3501 ms total)
 # [  PASSED  ] 124 tests.
