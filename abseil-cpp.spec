@@ -24,6 +24,15 @@ License:        Apache-2.0 AND LicenseRef-Fedora-Public-Domain
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
 
+# Disable negative NaN float ostream format checking on RISC-V
+# https://github.com/abseil/abseil-cpp/commit/96cdf6cc87e7a21d92f9f96a72263a93d3929ec7
+#
+# Fixes:
+#
+# [Bug]: NegativeNaN test fails on riscv64
+# https://github.com/abseil/abseil-cpp/issues/1684
+Patch:          https://github.com/abseil/abseil-cpp/commit/96cdf6cc87e7a21d92f9f96a72263a93d3929ec7.patch
+
 BuildRequires:  cmake
 # The default make backend would work just as well; ninja is observably faster
 BuildRequires:  ninja-build
@@ -89,19 +98,6 @@ Development headers for %{name}
 
 %prep
 %autosetup -p1 -S gendiff
-
-%ifarch riscv64
-# [Bug]: NegativeNaN test fails on riscv64
-# https://github.com/abseil/abseil-cpp/issues/1684
-# NOTE(davidlt): see https://github.com/WebAssembly/design/issues/646
-# [==========] 125 tests from 35 test suites ran. (3501 ms total)
-# [  PASSED  ] 124 tests.
-# [  FAILED  ] 1 test, listed below:
-# [  FAILED  ] FloatingPointLogFormatTest/0.NegativeNaN, where TypeParam = float
-#  1 FAILED TEST
-sed -r -i 's/\bNegativeNaN\b/DISABLED_&/' \
-    absl/log/log_format_test.cc
-%endif
 
 %build
 # ABSL_BUILD_TEST_HELPERS is needed to build libraries for the -testing

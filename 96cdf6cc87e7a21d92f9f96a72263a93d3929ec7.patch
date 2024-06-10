@@ -1,0 +1,52 @@
+From 96cdf6cc87e7a21d92f9f96a72263a93d3929ec7 Mon Sep 17 00:00:00 2001
+From: Benjamin Barenblat <bbaren@google.com>
+Date: Mon, 10 Jun 2024 10:14:21 -0700
+Subject: [PATCH] Disable negative NaN float ostream format checking on RISC-V
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It’s not clear whether negative NaN floats are supposed to print as
+"-nan" or "nan" on RISC-V (https://cplusplus.github.io/LWG/issue4101).
+Until that’s resolved, don’t require that logging such a float with
+Abseil produce the same result as streaming it to an ostream does.
+
+Closes: https://github.com/abseil/abseil-cpp/issues/1684
+PiperOrigin-RevId: 641942176
+Change-Id: Iec7ef130cc15c114714f2d124cb37886b3c37ab4
+---
+ absl/log/log_format_test.cc | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/absl/log/log_format_test.cc b/absl/log/log_format_test.cc
+index dbad5d97615..8ca6df3e586 100644
+--- a/absl/log/log_format_test.cc
++++ b/absl/log/log_format_test.cc
+@@ -608,6 +608,19 @@ TYPED_TEST(FloatingPointLogFormatTest, NegativeNaN) {
+   auto comparison_stream = ComparisonStream();
+   comparison_stream << value;
+ 
++  // On RISC-V, don't expect that formatting -NaN produces the same string as
++  // streaming it. #ifdefing out just the relevant line breaks the MSVC build,
++  // so duplicate the entire EXPECT_CALL.
++#ifdef __riscv
++  EXPECT_CALL(
++      test_sink,
++      Send(AllOf(
++          TextMessage(AnyOf(Eq("-nan"), Eq("nan"), Eq("NaN"), Eq("-nan(ind)"))),
++          ENCODED_MESSAGE(
++              AnyOf(EqualsProto(R"pb(value { str: "-nan" })pb"),
++                    EqualsProto(R"pb(value { str: "nan" })pb"),
++                    EqualsProto(R"pb(value { str: "-nan(ind)" })pb"))))));
++#else
+   EXPECT_CALL(
+       test_sink,
+       Send(AllOf(
+@@ -617,6 +630,7 @@ TYPED_TEST(FloatingPointLogFormatTest, NegativeNaN) {
+               AnyOf(EqualsProto(R"pb(value { str: "-nan" })pb"),
+                     EqualsProto(R"pb(value { str: "nan" })pb"),
+                     EqualsProto(R"pb(value { str: "-nan(ind)" })pb"))))));
++#endif
+   test_sink.StartCapturingLogs();
+   LOG(INFO) << value;
+ }
