@@ -3,7 +3,7 @@
 
 Name:           abseil-cpp
 Version:        20240116.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        C++ Common Libraries
 
 # The entire source is Apache-2.0, except:
@@ -243,6 +243,9 @@ Development headers for %{name}
 %{_libdir}/pkgconfig/absl_*.pc
 
 %changelog
+* Wed Jul 03 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 20240116.2-3
+- Rebuilt with upstream patch for NegativeNaN test failure on riscv64
+
 * Wed May 29 2024 David Abdurachmanov <davidlt@rivosinc.com> - 20240116.2-2
 - Disable NegativeNaN test on riscv64
 
