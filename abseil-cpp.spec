@@ -3,7 +3,7 @@
 
 Name:           abseil-cpp
 Version:        20240116.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        C++ Common Libraries
 
 # The entire source is Apache-2.0, except:
@@ -243,6 +243,9 @@ Development headers for %{name}
 %{_libdir}/pkgconfig/absl_*.pc
 
 %changelog
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20240116.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
 * Wed Jul 03 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 20240116.2-3
 - Rebuilt with upstream patch for NegativeNaN test failure on riscv64
 
